@@ -1,6 +1,8 @@
 # Consumer Credit Risk Verification API
 
-> 🚀 **Live:** [consumer-credit-risk-verification-api.onrender.com](https://consumer-credit-risk-verification-api.onrender.com) · **Docs:** [/docs](https://consumer-credit-risk-verification-api.onrender.com/docs)
+[![CI](https://github.com/CompsciiNikhil/Consumer-Credit-Risk-Verification-API/actions/workflows/ci.yml/badge.svg)](https://github.com/CompsciiNikhil/Consumer-Credit-Risk-Verification-API/actions/workflows/ci.yml)
+
+> 🚀 **Live:** [consumer-credit-risk-verification-api.onrender.com](https://consumer-credit-risk-verification-api.onrender.com) · **Docs:** [/docs](https://consumer-credit-risk-verification-api.onrender.com/docs) · **Repo:** [GitHub](https://github.com/CompsciiNikhil/Consumer-Credit-Risk-Verification-API)
 
 > A production-grade backend REST API that ingests consumer credit applications, applies a **transparent, rule-based risk scoring engine**, and exposes an auditable, testable service — mirroring the type of consumer-data-to-risk-signal pipeline that credit information companies (like TransUnion) operate.
 
@@ -88,8 +90,8 @@ All error responses follow a consistent structured format:
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/credit-risk-api.git  # update with your GitHub username
-cd credit-risk-api
+git clone https://github.com/CompsciiNikhil/Consumer-Credit-Risk-Verification-API.git
+cd Consumer-Credit-Risk-Verification-API
 
 # 2. Create and activate virtual environment
 python -m venv venv

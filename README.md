@@ -1,6 +1,6 @@
 # Consumer Credit Risk Verification API
 
-![CI](https://github.com/YOUR_USERNAME/credit-risk-api/actions/workflows/ci.yml/badge.svg)
+> 🚀 **Live:** [consumer-credit-risk-verification-api.onrender.com](https://consumer-credit-risk-verification-api.onrender.com) · **Docs:** [/docs](https://consumer-credit-risk-verification-api.onrender.com/docs)
 
 > A production-grade backend REST API that ingests consumer credit applications, applies a **transparent, rule-based risk scoring engine**, and exposes an auditable, testable service — mirroring the type of consumer-data-to-risk-signal pipeline that credit information companies (like TransUnion) operate.
 
@@ -88,7 +88,7 @@ All error responses follow a consistent structured format:
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/credit-risk-api.git
+git clone https://github.com/YOUR_USERNAME/credit-risk-api.git  # update with your GitHub username
 cd credit-risk-api
 
 # 2. Create and activate virtual environment
@@ -161,8 +161,8 @@ The `render.yaml` in the repo root defines:
 3. Set `DATABASE_URL` environment variable in Render dashboard (use the managed DB connection string)
 4. Render runs `alembic upgrade head` then starts the server automatically
 
-**Live URL:** `https://YOUR_SERVICE.onrender.com`
-**Swagger UI:** `https://YOUR_SERVICE.onrender.com/docs`
+**Live URL:** https://consumer-credit-risk-verification-api.onrender.com  
+**Swagger UI:** https://consumer-credit-risk-verification-api.onrender.com/docs
 
 ---
 

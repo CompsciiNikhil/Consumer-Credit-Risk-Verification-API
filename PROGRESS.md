@@ -7,7 +7,7 @@
 - [x] Phase 4 — Automated Tests
 - [x] Phase 5 — Postman Collection
 - [x] Phase 6 — CI/CD
-- [ ] Phase 7 — Deployment (Render) — requires user to push to GitHub + connect Render
+- [x] Phase 7 — Deployment (Render) — LIVE: https://consumer-credit-risk-verification-api.onrender.com
 - [x] Phase 8 — README & Polish
 
 ## Notes for next session
@@ -55,14 +55,13 @@ venv created at credit-risk-api/venv/.
 - Uses SQLite for CI (no Postgres service needed — keeps workflow simple and fast).
 - Steps: checkout → Python 3.11 → pip cache → install → alembic upgrade head → pytest.
 
-### Phase 7 — Deployment [TODO]
-Next steps for the user:
-1. Create a GitHub repo and push this directory.
-2. Go to render.com → New → Web Service → connect the GitHub repo.
-3. Render auto-detects render.yaml and creates the web service + managed Postgres DB.
-4. Set DATABASE_URL in Render env vars (copy from the managed DB dashboard).
-5. Trigger a deploy — Render runs `alembic upgrade head` then starts uvicorn.
-6. Update README.md badge URL and live URL placeholders (YOUR_USERNAME, YOUR_SERVICE).
+### Phase 7 — Deployment [DONE]
+Deployed to Render free tier.
+- Live URL: https://consumer-credit-risk-verification-api.onrender.com
+- Swagger UI: https://consumer-credit-risk-verification-api.onrender.com/docs
+- render.yaml provisions the web service + managed Postgres DB.
+- DATABASE_URL set via Render dashboard env vars.
+- Alembic runs automatically on deploy via buildCommand.
 
 ### Phase 8 — README & Polish [DONE]
 Full README with: project description, scoring architecture tables, endpoint table,

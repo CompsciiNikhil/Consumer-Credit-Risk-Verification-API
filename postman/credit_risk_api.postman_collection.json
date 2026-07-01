@@ -1,0 +1,346 @@
+{
+  "info": {
+    "_postman_id": "credit-risk-api-collection",
+    "name": "Credit Risk Verification API",
+    "description": "End-to-end test suite for the Consumer Credit Risk Verification API. Covers all 6 endpoints with assertions on status codes, response shape, and business logic.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "{{base_url}}" }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "pm.test('Service is ok', () => {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json.status).to.eql('ok');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Application — Low Risk",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/applications",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"applicant_name\": \"Alice Smith\",\n  \"annual_income\": 120000,\n  \"existing_debt\": 10000,\n  \"credit_score\": 780,\n  \"loan_amount_requested\": 20000,\n  \"employment_status\": \"employed\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "pm.test('Has risk_score', () => pm.expect(json).to.have.property('risk_score'));",
+              "pm.test('Has risk_band', () => pm.expect(json).to.have.property('risk_band'));",
+              "pm.test('Has id', () => pm.expect(json).to.have.property('id'));",
+              "pm.test('Risk band is LOW', () => pm.expect(json.risk_band).to.eql('LOW'));",
+              "pm.test('Status is pending', () => pm.expect(json.status).to.eql('pending'));",
+              "pm.environment.set('low_risk_id', json.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Application — High Risk (auto-flagged)",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/applications",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"applicant_name\": \"Bob Jones\",\n  \"annual_income\": 30000,\n  \"existing_debt\": 25000,\n  \"credit_score\": 520,\n  \"loan_amount_requested\": 50000,\n  \"employment_status\": \"unemployed\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "pm.test('Risk band is HIGH', () => pm.expect(json.risk_band).to.eql('HIGH'));",
+              "pm.test('Status auto-flagged', () => pm.expect(json.status).to.eql('flagged'));",
+              "pm.test('Risk score > 66', () => pm.expect(json.risk_score).to.be.above(66));",
+              "pm.environment.set('high_risk_id', json.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Application — Invalid Credit Score (422)",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/applications",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"applicant_name\": \"Test User\",\n  \"annual_income\": 50000,\n  \"existing_debt\": 0,\n  \"credit_score\": 200,\n  \"loan_amount_requested\": 10000,\n  \"employment_status\": \"employed\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 422 for invalid credit_score', () => pm.response.to.have.status(422));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Applications",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/applications"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Returns array', () => pm.expect(json).to.be.an('array'));",
+              "pm.test('Each item has risk_score', () => {",
+              "  json.forEach(item => pm.expect(item).to.have.property('risk_score'));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Applications — Filter by status=flagged",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/applications?status=flagged",
+          "query": [{ "key": "status", "value": "flagged" }]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('All results are flagged', () => {",
+              "  json.forEach(item => pm.expect(item.status).to.eql('flagged'));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Applications — Filter by risk_band=HIGH",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/applications?risk_band=HIGH",
+          "query": [{ "key": "risk_band", "value": "HIGH" }]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('All results are HIGH risk', () => {",
+              "  json.forEach(item => pm.expect(item.risk_band).to.eql('HIGH'));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Application by ID",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/applications/{{low_risk_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('ID matches', () => pm.expect(json.id).to.eql(parseInt(pm.environment.get('low_risk_id'))));",
+              "pm.test('Has applicant_name', () => pm.expect(json).to.have.property('applicant_name'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Application — Not Found (404)",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/applications/99999"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 404', () => pm.response.to.have.status(404));",
+              "const json = pm.response.json();",
+              "pm.test('Has detail field', () => pm.expect(json).to.have.property('detail'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Review Application — Approve",
+      "request": {
+        "method": "PUT",
+        "url": "{{base_url}}/applications/{{low_risk_id}}/review",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"status\": \"approved\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Status changed to approved', () => pm.expect(json.status).to.eql('approved'));",
+              "pm.test('Risk fields preserved', () => {",
+              "  pm.expect(json).to.have.property('risk_score');",
+              "  pm.expect(json).to.have.property('risk_band');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Review Application — Invalid Status (422)",
+      "request": {
+        "method": "PUT",
+        "url": "{{base_url}}/applications/{{low_risk_id}}/review",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"status\": \"pending\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 422 for invalid review status', () => pm.response.to.have.status(422));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Risk Report — Filter by Score Range",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/applications/risk-report?min_score=67&max_score=100",
+          "query": [
+            { "key": "min_score", "value": "67" },
+            { "key": "max_score", "value": "100" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('All results within score range', () => {",
+              "  json.forEach(item => {",
+              "    pm.expect(item.risk_score).to.be.at.least(67);",
+              "    pm.expect(item.risk_score).to.be.at.most(100);",
+              "  });",
+              "});",
+              "pm.test('Results sorted descending', () => {",
+              "  const scores = json.map(i => i.risk_score);",
+              "  const sorted = [...scores].sort((a, b) => b - a);",
+              "  pm.expect(scores).to.deep.equal(sorted);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete Application (Soft Delete)",
+      "request": {
+        "method": "DELETE",
+        "url": "{{base_url}}/applications/{{high_risk_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Verify Deleted App Excluded from List",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/applications"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "const deletedId = parseInt(pm.environment.get('high_risk_id'));",
+              "pm.test('Deleted app not in list', () => {",
+              "  const ids = json.map(i => i.id);",
+              "  pm.expect(ids).to.not.include(deletedId);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

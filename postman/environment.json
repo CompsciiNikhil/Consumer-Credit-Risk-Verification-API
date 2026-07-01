@@ -1,0 +1,28 @@
+{
+  "id": "credit-risk-api-env",
+  "name": "Credit Risk API — Environment",
+  "values": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "default",
+      "enabled": true,
+      "description": "Swap to your Render URL for production testing"
+    },
+    {
+      "key": "low_risk_id",
+      "value": "",
+      "type": "default",
+      "enabled": true,
+      "description": "Set automatically by the Create Low Risk request"
+    },
+    {
+      "key": "high_risk_id",
+      "value": "",
+      "type": "default",
+      "enabled": true,
+      "description": "Set automatically by the Create High Risk request"
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}
